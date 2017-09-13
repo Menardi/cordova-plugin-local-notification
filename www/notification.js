@@ -1,3 +1,4 @@
+cordova.define("phonegap-plugin-local-notification.Notification", function(require, exports, module) {
 /* global cordova:false */
 /* globals window */
 
@@ -27,6 +28,9 @@ var Notification = function(title, options) {
     this.body = getValue(options.body, '');
     this.tag = getValue(options.tag, '');
     this.icon = getValue(options.icon, '');
+    this.sound = getValue(options.sound, '');
+    this.when = getValue(options.when, '0');
+    this.url = getValue(options.url, '');
     this.onclick = function() {};
     this.onshow = function() {};
     this.onerror = function() {};
@@ -50,7 +54,7 @@ var Notification = function(title, options) {
         that.onerror();
     };
 
-    exec(success, failure, 'LocalNotifications', 'show', [this.title, this.dir, this.lang, this.body, this.tag, this.icon]);
+    exec(success, failure, 'LocalNotifications', 'show', [this.title, this.dir, this.lang, this.body, this.tag, this.icon, this.sound, this.when, this.url]);
 };
 
 /**
@@ -103,3 +107,5 @@ Notification.prototype.close = function() {
  */
 
 module.exports = Notification;
+
+});

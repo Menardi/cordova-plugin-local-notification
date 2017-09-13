@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.support.v4.app.RemoteInput;
 import android.content.BroadcastReceiver;
+import android.net.Uri;
 
  public class NotificationHandlerActivity extends Activity {
     private static String LOG_TAG = "LocalNotification_PushHandlerActivity";
@@ -23,23 +24,15 @@ import android.content.BroadcastReceiver;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LOG_TAG, "in on create of pushhandleractivity");
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         String tag = extras.getString("tag", "");
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(tag, 0);
-        LocalNotifications.fireClickEvent(tag);
-        forceMainActivityReload();
+        String url = extras.getString("url", "");
+        Uri uri = Uri.parse(url); // missing 'http://' will cause crashed
+        Intent intent2 = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent2);
         finish();
-    }
-
-    /**
-     * Forces the main activity to re-launch if it's unloaded.
-     */
-    private void forceMainActivityReload() {
-        PackageManager pm = getPackageManager();
-        Intent launchIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
-        startActivity(launchIntent);
     }
 }

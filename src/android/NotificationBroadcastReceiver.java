@@ -54,6 +54,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             String tag = args.getString(4);
             String icon = args.getString(5);
             String sound = args.getString(6);
+            long when = args.getLong(7);
+            String url = args.getString(8);
 
             Log.v(TAG, "now="+System.currentTimeMillis() + " args="+args.toString());
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -61,7 +63,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
             notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             notificationIntent.putExtra("tag", tag);
-            notificationIntent.putExtra("args", args.toString());
+            notificationIntent.putExtra("url", url);
             PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             int smallIcon = context.getResources().getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
             String soundUrl = getMP3DataURIFromURL(sound);

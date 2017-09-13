@@ -79,15 +79,7 @@ public class LocalNotifications extends CordovaPlugin {
         Intent notificationBroadcastReceiverIntent = new Intent(context, NotificationBroadcastReceiver.class);
         notificationBroadcastReceiverIntent.putExtra("args", args.toString());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, notificationBroadcastReceiverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        Log.v(TAG, "PENDING INTENT NOW: "+pendingIntent);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when, pendingIntent);
-    }
-
-
-    public static void fireClickEvent(String tag) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, "click");
-        result.setKeepCallback(true);
-        notificationContext.sendPluginResult(result);
     }
 }
