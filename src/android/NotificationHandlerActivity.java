@@ -2,12 +2,14 @@ package com.adobe.phonegap.notification;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.v4.app.RemoteInput;
+import android.content.BroadcastReceiver;
 
  public class NotificationHandlerActivity extends Activity {
     private static String LOG_TAG = "LocalNotification_PushHandlerActivity";
@@ -21,19 +23,14 @@ import android.support.v4.app.RemoteInput;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d(LOG_TAG, "in on create of pushhandleractivity");
-
+        Log.v(LOG_TAG, "in on create of pushhandleractivity");
         Intent intent = getIntent();
-        String tag = intent.getExtras().getString("tag", "");
-
+        Bundle extras = intent.getExtras();
+        String tag = extras.getString("tag", "");
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(tag, 0);
-
         LocalNotifications.fireClickEvent(tag);
-
         forceMainActivityReload();
-
         finish();
     }
 
