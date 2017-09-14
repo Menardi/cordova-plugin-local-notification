@@ -15,6 +15,7 @@
     </config-file>
     <source-file src="src/android/LocalNotifications.java" target-dir="src/com/adobe/phonegap/notification"/>
     <source-file src="src/android/NotificationHandlerActivity.java" target-dir="src/com/adobe/phonegap/notification"/>
+    <source-file src="src/android/NotificationBroadcastReceiver.java" target-dir="src/com/adobe/phonegap/notification"/>
     <framework src="com.android.support:support-v13:23+"/>
   </platform>
   <platform name="ios">
