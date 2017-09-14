@@ -65,7 +65,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             notificationIntent.putExtra("tag", tag);
             notificationIntent.putExtra("url", url);
             PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            int smallIcon = context.getResources().getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
+            int smallIcon = context.getResources().getIdentifier("ic_statusbar_icon", "mipmap", context.getPackageName());
             String soundUrl = getMP3DataURIFromURL(sound);
             // Build notifications
             NotificationCompat.Builder mBuilder =
