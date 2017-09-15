@@ -89,6 +89,19 @@ Notification.prototype.close = function() {
     }, 'LocalNotifications', 'close', [this.tag]);
 };
 
+
+/**
+  * @description requests permission from the user to show a local notification.
+  * @function cancel
+  * @memberof Notification
+  * @param {!string} tag of the local notification.
+  */
+Notification.cancel = function(tag) {
+    exec(function() {
+    }, function() {
+    }, 'LocalNotifications', 'close', [tag]);
+};
+
 /**
  * @description A callback to be used when the requestPermission method returns a value.
  *
