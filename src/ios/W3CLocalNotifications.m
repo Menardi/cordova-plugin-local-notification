@@ -64,6 +64,21 @@
     content.sound = [UNNotificationSound defaultSound];
     content.badge = [NSNumber numberWithInt:1];
     content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8]};
+
+    NSString *identifier = [command.arguments objectAtIndex:4];
+    double ms = [[command.arguments objectAtIndex:7] doubleValue];
+    NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
+    //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    //NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *date = [calendar components:(NSYearCalendarUnit  |
+                                                     NSMonthCalendarUnit |
+                                                     NSDayCalendarUnit   |
+                                                     NSHourCalendarUnit  |
+                                                     NSMinuteCalendarUnit|
+                                                     NSSecondCalendarUnit) fromDate:when];
+    UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
+
     [content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
 
     NSString *imageUrl = [command.arguments objectAtIndex:5];
@@ -78,19 +93,6 @@
                 content.attachments = [NSArray arrayWithObject:attachment];
             }
 
-            NSString *identifier = [command.arguments objectAtIndex:4];
-            double ms = [[command.arguments objectAtIndex:7] doubleValue];
-            NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
-            //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
-            //NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
-            NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-            NSDateComponents *date = [calendar components:(NSYearCalendarUnit  |
-                                                             NSMonthCalendarUnit |
-                                                             NSDayCalendarUnit   |
-                                                             NSHourCalendarUnit  |
-                                                             NSMinuteCalendarUnit|
-                                                             NSSecondCalendarUnit) fromDate:when];
-            UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
             UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger ];
             [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
