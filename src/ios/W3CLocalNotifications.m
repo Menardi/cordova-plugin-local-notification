@@ -71,12 +71,12 @@
     //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
     //NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents *date = [calendar components:(NSYearCalendarUnit  |
-                                                     NSMonthCalendarUnit |
-                                                     NSDayCalendarUnit   |
-                                                     NSHourCalendarUnit  |
-                                                     NSMinuteCalendarUnit|
-                                                     NSSecondCalendarUnit) fromDate:when];
+    NSDateComponents *date = [calendar components:(NSCalendarUnitYear  |
+                                                     NSCalendarUnitMonth |
+                                                     NSCalendarUnitDay   |
+                                                     NSCalendarUnitHour  |
+                                                     NSCalendarUnitMinute |
+                                                     NSCalendarUnitSecond) fromDate:when];
     UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
 
     [content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
@@ -114,7 +114,7 @@
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
 
     NSArray *identifiers = @[[command.arguments objectAtIndex:0]];
-    [center removeDeliveredNotificationsWithIdentifiers:identifiers];
+    [center removePendingNotificationRequestsWithIdentifiers:identifiers];
 
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
