@@ -16,10 +16,27 @@
     UNMutableNotificationContent *content = [UNMutableNotificationContent new];
     content.title = [command.arguments objectAtIndex:0];
     content.body = [command.arguments objectAtIndex:3];
-
+    content.sound = [UNNotificationSound defaultSound];
+    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8]};
+    [content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
     NSString *identifier = [command.arguments objectAtIndex:4];
 
-    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
+    double ms = [[command.arguments objectAtIndex:7] doubleValue];
+    NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
+    //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    //NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *date = [calendar components:(NSYearCalendarUnit  |
+                                                     NSMonthCalendarUnit |
+                                                     NSDayCalendarUnit   |
+                                                     NSHourCalendarUnit  |
+                                                     NSMinuteCalendarUnit|
+                                                     NSSecondCalendarUnit) fromDate:when];
+
+    UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
+
+
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger ];
 
     [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
@@ -27,7 +44,8 @@
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } else {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"show"];
+             NSLog(@"alarm scheduled");
+             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"show"];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
