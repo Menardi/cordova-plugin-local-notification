@@ -75,6 +75,13 @@ Notification.requestPermission = function(callback) {
     }, 'LocalNotifications', 'requestPermission', []);
 };
 
+
+Notification.settings = function() {
+    exec(function() {}, function() {
+        console.log('settings error');
+    }, 'LocalNotifications', 'settings', []);
+};
+
 /**
   * @description closes an open notification.
   * @function close
