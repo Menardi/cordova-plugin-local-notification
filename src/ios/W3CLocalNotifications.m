@@ -122,7 +122,14 @@
         }
     }];
 }
+- (void)settings:(CDVInvokedUrlCommand*)command {
+    NSLog(@"in plugin, settings");
 
+    if (&UIApplicationOpenSettingsURLString != NULL) {
+       NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
 - (void)notificationClicked {
     NSLog(@"in plugin, local notification clicked");
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"click"];

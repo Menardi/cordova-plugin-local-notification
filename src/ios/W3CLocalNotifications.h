@@ -17,5 +17,6 @@
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)requestPermission:(CDVInvokedUrlCommand*)command;
 - (void)notificationClicked;
+- (void)settings:(CDVInvokedUrlCommand*)command;
 
 @end
