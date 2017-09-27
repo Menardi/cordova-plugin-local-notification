@@ -53,7 +53,7 @@ var LocalNotification = function(title, options) {
         that.onerror();
     };
 
-    exec(success, failure, 'LocalLocalNotifications', 'show', [this.title, this.dir, this.lang, this.body, this.tag, this.icon, this.sound, this.when, this.url]);
+    exec(success, failure, 'LocalNotifications', 'show', [this.title, this.dir, this.lang, this.body, this.tag, this.icon, this.sound, this.when, this.url]);
 };
 
 /**
@@ -72,14 +72,14 @@ LocalNotification.requestPermission = function(callback) {
 
     exec(callback, function() {
         console.log('requestPermission error');
-    }, 'LocalLocalNotifications', 'requestPermission', []);
+    }, 'LocalNotifications', 'requestPermission', []);
 };
 
 
 LocalNotification.settings = function() {
     exec(function() {}, function() {
         console.log('settings error');
-    }, 'LocalLocalNotifications', 'settings', []);
+    }, 'LocalNotifications', 'settings', []);
 };
 
 /**
@@ -93,7 +93,7 @@ LocalNotification.prototype.close = function() {
         that.onclose();
     }, function() {
         that.onerror();
-    }, 'LocalLocalNotifications', 'close', [this.tag]);
+    }, 'LocalNotifications', 'close', [this.tag]);
 };
 
 
@@ -106,7 +106,7 @@ LocalNotification.prototype.close = function() {
 LocalNotification.cancel = function(tag) {
     exec(function() {
     }, function() {
-    }, 'LocalLocalNotifications', 'close', [tag]);
+    }, 'LocalNotifications', 'close', [tag]);
 };
 
 /**
