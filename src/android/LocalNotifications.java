@@ -76,7 +76,7 @@ public class LocalNotifications extends CordovaPlugin {
             }
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
         } else if (action.equals("requestPermission")) {
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
             if (mNotificationManager.areNotificationsEnabled()) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "granted"));
             } else {
