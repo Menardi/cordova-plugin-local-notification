@@ -69,7 +69,7 @@
                                                    NSCalendarUnitMinute |
                                                    NSCalendarUnitSecond) fromDate:when];
     UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
-    [content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
+    //[content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
     NSString *imageUrl = [command.arguments objectAtIndex:5];
     UNNotificationAttachment *imageAttachment = [self loadAttachment:imageUrl];
     if (imageAttachment) {
