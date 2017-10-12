@@ -55,8 +55,9 @@
     content.title = [command.arguments objectAtIndex:0];
     content.body = [command.arguments objectAtIndex:3];
     content.badge = [NSNumber numberWithInt:1];
-    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8]};
     NSString *identifier = [command.arguments objectAtIndex:4];
+    NSString *imageUrl = [command.arguments objectAtIndex:5];
+    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8], @"imageUrl": imageUrl};
     double ms = [[command.arguments objectAtIndex:7] doubleValue];
     NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
     //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
@@ -70,7 +71,6 @@
                                                    NSCalendarUnitSecond) fromDate:when];
     UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
     //[content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
-    NSString *imageUrl = [command.arguments objectAtIndex:5];
     UNNotificationAttachment *imageAttachment = [self loadAttachment:imageUrl];
     if (imageAttachment) {
         NSLog(@"loading notification image: %@",imageUrl);
