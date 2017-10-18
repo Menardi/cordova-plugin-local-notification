@@ -57,7 +57,8 @@
     content.badge = [NSNumber numberWithInt:1];
     NSString *identifier = [command.arguments objectAtIndex:4];
     NSString *imageUrl = [command.arguments objectAtIndex:5];
-    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8], @"imageUrl": imageUrl};
+    NSString *soundUrl = [command.arguments objectAtIndex:6];
+    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8], @"imageUrl": imageUrl, @"soundUrl": soundUrl};
     double ms = [[command.arguments objectAtIndex:7] doubleValue];
     NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
     //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
@@ -76,7 +77,6 @@
         NSLog(@"loading notification image: %@",imageUrl);
         content.attachments = @[imageAttachment];
     }
-    NSString *soundUrl = [command.arguments objectAtIndex:6];
     NSLog(@"loading notification sound: %@",soundUrl);
     content.sound = [self loadSound:soundUrl];
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger ];
