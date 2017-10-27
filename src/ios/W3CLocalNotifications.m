@@ -125,7 +125,7 @@
 - (void)settings:(CDVInvokedUrlCommand*)command {
     NSLog(@"in plugin, settings");
 
-    if (&UIApplicationOpenSettingsURLString != NULL) {
+    if (&UIApplicationOpenSettingsURLString != nil) {
        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
     }
