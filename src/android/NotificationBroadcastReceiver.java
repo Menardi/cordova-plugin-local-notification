@@ -10,7 +10,6 @@ import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
