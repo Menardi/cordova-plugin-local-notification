@@ -1,8 +1,8 @@
 package com.adobe.phonegap.notification;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.Notification;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.NotificationCompat;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,7 +27,7 @@ import android.net.Uri;
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         String tag = extras.getString("tag", "");
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         notificationManager.cancel(tag, 0);
         String url = extras.getString("url", "");
         Uri uri = Uri.parse(url); // missing 'http://' will cause crashed

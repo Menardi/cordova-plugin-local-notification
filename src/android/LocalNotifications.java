@@ -9,9 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
+import android.support.v4.app.AlarmManagerCompat;
 import android.app.Notification;
 import android.content.Context;
 import android.provider.Settings;
@@ -62,7 +62,8 @@ public class LocalNotifications extends CordovaPlugin {
         } else if (action.equals("close")) {
             Log.d(TAG, "action close");
             String tag = args.getString(0);
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            // NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
             mNotificationManager.cancel(tag, 0);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent notificationBroadcastReceiverIntent = new Intent(context, NotificationBroadcastReceiver.class);
@@ -118,6 +119,6 @@ public class LocalNotifications extends CordovaPlugin {
         notificationBroadcastReceiverIntent.putExtra("args", args.toString());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, notificationBroadcastReceiverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when, pendingIntent);
+        AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, when, pendingIntent);
     }
 }

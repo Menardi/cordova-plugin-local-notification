@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -17,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Base64;
@@ -58,7 +58,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             String url = args.getString(8);
 
             Log.v(TAG, "now="+System.currentTimeMillis() + " args="+args.toString());
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
             int requestCode = new Random().nextInt();
             Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
             notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -111,6 +111,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
     private String getMP3DataURIFromURL(String strURL) {
         try {
+            Log.v(TAG, "GETTING MP3 FROM "+strURL);
             URL url = new URL(strURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(15000);
