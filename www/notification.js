@@ -1,4 +1,3 @@
-cordova.define("phonegap-plugin-local-notification.LocalNotification", function(require, exports, module) {
 /* global cordova:false */
 /* globals window */
 
@@ -115,5 +114,3 @@ exec(function(data) {
  */
 
 module.exports = LocalNotification;
-
-});
