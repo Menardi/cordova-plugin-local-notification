@@ -5,7 +5,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
@@ -27,6 +27,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 import android.content.BroadcastReceiver;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import java.util.List;
 
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
@@ -43,51 +46,71 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         }).start();
     }
 
+    public Boolean isInForeGround(final Context context) {
+        Log.v(TAG, "Checking if app is in foreground");
+        ActivityManager activityManager = (ActivityManager) context.getSystemService( Context.ACTIVITY_SERVICE );
+        List<RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        int pid = android.os.Process.myPid();
+        for(RunningAppProcessInfo appProcess : appProcesses){
+            if (pid == appProcess.pid && appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                Log.v(TAG, "Checking if app is in foreground: yes");
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void startNotification(final Context context, Intent intent) {
         try {
-            JSONArray args = new JSONArray(intent.getStringExtra("args"));
-            String title = args.getString(0);
-            String dir = args.getString(1);
-            String lang = args.getString(2);
-            String body = args.getString(3);
-            String tag = args.getString(4);
-            String icon = args.getString(5);
-            String sound = args.getString(6);
-            long when = args.getLong(7);
-            String url = args.getString(8);
+            JSONObject args = new JSONObject(intent.getStringExtra("args"));
+            String title = args.getString("title");
+            String dir = args.getString("dir");
+            String lang = args.getString("lang");
+            String body = args.getString("body");
+            String tag = args.getString("tag");
+            String icon = args.getString("icon");
+            String sound = args.getString("sound");
+            long when = args.getLong("when");
+            String url = args.getString("url");
 
-            Log.v(TAG, "now="+System.currentTimeMillis() + " args="+args.toString());
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            int requestCode = new Random().nextInt();
-            Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
-            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            notificationIntent.putExtra("tag", tag);
-            notificationIntent.putExtra("url", url);
-            PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            int smallIcon = context.getResources().getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
-            String soundUrl = getMP3DataURIFromURL(sound);
-            // Build notifications
-            NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                    .setWhen(System.currentTimeMillis())
-                    .setContentTitle(title)
-                    .setContentText(body)
-                    .setSmallIcon(smallIcon)
-                    .setVibrate(new long[]{100, 200, 100, 500})
-                    .setContentIntent(contentIntent)
-                    .setAutoCancel(true);
-
-            if (soundUrl != null) {
-                mBuilder.setSound(android.net.Uri.parse(soundUrl));
+            if (LocalNotifications.notificationContext != null && isInForeGround(context)) {
+                PluginResult result = new PluginResult(PluginResult.Status.OK, args);
+                result.setKeepCallback(true);
+                LocalNotifications.notificationContext.sendPluginResult(result);
             } else {
-                mBuilder.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+                Log.v(TAG, "show notification now=" + System.currentTimeMillis() + " args=" + args.toString());
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                int requestCode = new Random().nextInt();
+                Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
+                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                notificationIntent.putExtra("tag", tag);
+                notificationIntent.putExtra("url", url);
+                PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                int smallIcon = context.getResources().getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
+                String soundUrl = getMP3DataURIFromURL(sound);
+                // Build notifications
+                NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                        .setWhen(System.currentTimeMillis())
+                        .setContentTitle(title)
+                        .setContentText(body)
+                        .setSmallIcon(smallIcon)
+                        .setVibrate(new long[]{100, 200, 100, 500})
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true);
+
+                if (soundUrl != null) {
+                    mBuilder.setSound(android.net.Uri.parse(soundUrl));
+                } else {
+                    mBuilder.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+                }
+                if (icon.startsWith("http://") || icon.startsWith("https://")) {
+                    Bitmap bitmap = getBitmapFromURL(icon);
+                    mBuilder.setLargeIcon(bitmap);
+                }
+                Notification notification = mBuilder.build();
+                notificationManager.notify(tag, 0, notification);
             }
-            if (icon.startsWith("http://") || icon.startsWith("https://")) {
-                Bitmap bitmap = getBitmapFromURL(icon);
-                mBuilder.setLargeIcon(bitmap);
-            }
-            Notification notification = mBuilder.build();
-            notificationManager.notify(tag, 0, notification);
         } catch (JSONException e) {
             Log.v(TAG, "JSON ERROR: "+e);
         }
@@ -110,7 +133,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
     private String getMP3DataURIFromURL(String strURL) {
         try {
-            Log.v(TAG, "GETTING MP3 FROM "+strURL);
+            Log.v(TAG, "getting MP3 from "+strURL);
             URL url = new URL(strURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(15000);

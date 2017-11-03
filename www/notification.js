@@ -1,3 +1,4 @@
+cordova.define("phonegap-plugin-local-notification.LocalNotification", function(require, exports, module) {
 /* global cordova:false */
 /* globals window */
 
@@ -16,20 +17,18 @@ var LocalNotification = function(title, options) {
     if (typeof title === 'undefined') {
         throw new Error('The title argument is required.');
     }
-
     options = options || {};
-    var getValue = argscheck.getValue;
+    options.title = options.title || title;
+    options.dir = options.dir || 'auto';
+    options.body = options.body || '';
+    options.lang = options.lang || '';
+    options.tag = options.tag || '';
+    options.icon = options.icon || '';
+    options.sound = options.sound || '';
+    options.url = options.url || '';
+    options.when = options.when || 0;
 
     this.permission = 'granted';
-    this.title = getValue(title, '');
-    this.dir = getValue(options.dir, 'auto');
-    this.lang = getValue(options.lang, '');
-    this.body = getValue(options.body, '');
-    this.tag = getValue(options.tag, '');
-    this.icon = getValue(options.icon, '');
-    this.sound = getValue(options.sound, '');
-    this.when = getValue(options.when, '0');
-    this.url = getValue(options.url, '');
     this.onclick = function() {};
     this.onshow = function() {};
     this.onerror = function() {};
@@ -41,19 +40,16 @@ var LocalNotification = function(title, options) {
         if (!result) {
             return;
         }
-
         if (result === 'show') {
             that.onshow();
         } else if (result === 'click') {
             that.onclick();
         }
     };
-
     var failure = function() {
         that.onerror();
     };
-
-    exec(success, failure, 'LocalNotifications', 'show', [this.title, this.dir, this.lang, this.body, this.tag, this.icon, this.sound, this.when, this.url]);
+    exec(success, failure, 'LocalNotifications', 'show', [options]);
 };
 
 /**
@@ -72,30 +68,15 @@ LocalNotification.requestPermission = function(callback) {
 
     exec(callback, function() {
         console.log('requestPermission error');
-    }, 'LocalNotifications', 'requestPermission', []);
+    }, 'LocalNotifications', 'requestPermission', [{}]);
 };
 
 
 LocalNotification.settings = function() {
     exec(function() {}, function() {
         console.log('settings error');
-    }, 'LocalNotifications', 'settings', []);
+    }, 'LocalNotifications', 'settings', [{}]);
 };
-
-/**
-  * @description closes an open notification.
-  * @function close
-  * @memberof LocalNotification
-  */
-LocalNotification.prototype.close = function() {
-    var that = this;
-    exec(function() {
-        that.onclose();
-    }, function() {
-        that.onerror();
-    }, 'LocalNotifications', 'close', [this.tag]);
-};
-
 
 /**
   * @description requests permission from the user to show a local notification.
@@ -106,8 +87,16 @@ LocalNotification.prototype.close = function() {
 LocalNotification.cancel = function(tag) {
     exec(function() {
     }, function() {
-    }, 'LocalNotifications', 'close', [tag]);
+    }, 'LocalNotifications', 'close', [{tag: tag}]);
 };
+
+exec(function(data) {
+        var event = new CustomEvent("localnotification", { detail: data });
+        document.dispatchEvent(event);
+    }, function(e) {
+        console.log("LISTEN ERROR: ", e);
+    }, 'LocalNotifications', 'listen', [{}]
+);
 
 /**
  * @description A callback to be used when the requestPermission method returns a value.
@@ -126,3 +115,5 @@ LocalNotification.cancel = function(tag) {
  */
 
 module.exports = LocalNotification;
+
+});

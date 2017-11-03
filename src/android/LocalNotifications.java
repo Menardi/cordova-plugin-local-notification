@@ -6,6 +6,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
@@ -39,7 +40,7 @@ public class LocalNotifications extends CordovaPlugin {
 
     private static final String TAG = "LocalNotifications";
 
-    private static CallbackContext notificationContext;
+    public static CallbackContext notificationContext;
 
      /**
      * Executes the request and returns PluginResult.
@@ -50,18 +51,16 @@ public class LocalNotifications extends CordovaPlugin {
      */
     @SuppressLint("NewApi")
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        Log.d(TAG, "in local notifications");
+        Log.d(TAG, "in local notifications: "+action);
+        JSONObject realargs = args.getJSONObject(0);
         Context context = cordova.getActivity();
         if (action.equals("show")) {
-            Log.d(TAG, "action show");
-            notificationContext = callbackContext;
-            showNotification(args);
+            showNotification(realargs);
             PluginResult result = new PluginResult(PluginResult.Status.OK, "show");
             result.setKeepCallback(true);
-            notificationContext.sendPluginResult(result);
+            callbackContext.sendPluginResult(result);
         } else if (action.equals("close")) {
-            Log.d(TAG, "action close");
-            String tag = args.getString(0);
+            String tag = realargs.getString("tag");
             // NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
             mNotificationManager.cancel(tag, 0);
@@ -99,6 +98,8 @@ public class LocalNotifications extends CordovaPlugin {
                 intent.setData(Uri.parse("package:" + context.getPackageName()));
             }
             context.startActivity(intent);
+        } else if (action.equals("listen")) {
+            notificationContext = callbackContext;
         } else {
             Log.d(TAG, "return false");
             return false;
@@ -106,14 +107,15 @@ public class LocalNotifications extends CordovaPlugin {
         return true;
     }
 
-    private void showNotification(JSONArray args) throws JSONException {
+    private void showNotification(JSONObject args) throws JSONException {
         // Get args
-        long when = args.getLong(7);
+        long when = args.getLong("when");
         if (when == 0) {
             when = System.currentTimeMillis();
         }
+        Log.v(TAG, "schedule notification now=" + System.currentTimeMillis() + " when=" + when + " args=" + args.toString());
         Context context = cordova.getActivity();
-        String tag = args.getString(4);
+        String tag = args.getString("tag");
         int requestCode = tag.hashCode();
         Intent notificationBroadcastReceiverIntent = new Intent(context, NotificationBroadcastReceiver.class);
         notificationBroadcastReceiverIntent.putExtra("args", args.toString());
