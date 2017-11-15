@@ -17,10 +17,10 @@
     <source-file src="src/android/LocalNotifications.java" target-dir="src/com/adobe/phonegap/notification"/>
     <source-file src="src/android/NotificationHandlerActivity.java" target-dir="src/com/adobe/phonegap/notification"/>
     <source-file src="src/android/NotificationBroadcastReceiver.java" target-dir="src/com/adobe/phonegap/notification"/>
-    <framework src="com.android.support:support-v4:25" />
-    <framework src="com.android.support:appcompat-v7:25" />
-    <framework src="com.android.support:recyclerview-v7:25" />
-    <framework src="com.android.support:support-v13:25" />
+    <framework src="com.android.support:support-v4:27+" />
+    <framework src="com.android.support:appcompat-v7:27+" />
+    <framework src="com.android.support:recyclerview-v7:27+" />
+    <framework src="com.android.support:support-v13:27+" />
   </platform>
   <platform name="ios">
     <config-file target="config.xml" parent="/*">
