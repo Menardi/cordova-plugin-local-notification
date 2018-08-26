@@ -1,3 +1,4 @@
+cordova.define("phonegap-plugin-local-notification.LocalNotification", function(require, exports, module) {
 /* global cordova:false */
 /* globals window */
 
@@ -8,47 +9,80 @@ var argscheck = cordova.require('cordova/argscheck'),
 /**
  *  @description A global object that lets you interact with the LocalNotification API.
  *  @global
- *  @param {!string} title of the local notification.
  *  @param {?Options} options An object containing optional property/value pairs.
  */
-var LocalNotification = function(title, options) {
-    // require title parameter
-    if (typeof title === 'undefined') {
-        throw new Error('The title argument is required.');
+var LocalNotification = function(options) {
+
+};
+
+/**
+ * @description Create one or more notifications
+ * @param options A single options object, or array of options objects, to create notifications
+ */
+
+LocalNotification.create = function(options) {
+    var notifications;
+    if(options instanceof Array) {
+        notifications = options;
+    } else {
+        notifications = [options];
     }
-    options = options || {};
-    options.title = options.title || title;
-    options.dir = options.dir || 'auto';
-    options.body = options.body || '';
-    options.lang = options.lang || '';
-    options.tag = options.tag || '';
-    options.icon = options.icon || '';
-    options.sound = options.sound || '';
-    options.url = options.url || '';
-    options.when = options.when || 0;
 
-    this.permission = 'granted';
-    this.onclick = function() {};
-    this.onshow = function() {};
-    this.onerror = function() {};
-    this.onclose = function() {};
+    notifications.forEach(function(options) {
+        options.title = options.title || title;
+        options.body = options.body || '';
+        options.tag = options.tag || '';
+        options.icon = options.icon || '';
+        options.smallIcon = options.smallIcon || '';
+        options.sound = options.sound || '';
+        options.url = options.url || '';
 
-    // triggered on click, show, error and close
-    var that = this;
-    var success = function(result) {
-        if (!result) {
-            return;
+        if(options.when instanceof Date) {
+            options.when = options.when.getTime();
+        } else {
+            options.when = options.when || 0;
         }
-        if (result === 'show') {
-            that.onshow();
-        } else if (result === 'click') {
-            that.onclick();
-        }
-    };
-    var failure = function() {
-        that.onerror();
-    };
-    exec(success, failure, 'LocalNotifications', 'show', [options]);
+    });
+
+    // this.permission = 'granted';
+    // this.onclick = function() {};
+    // this.onshow = function() {};
+    // this.onerror = function() {};
+    // this.onclose = function() {};
+
+    // // triggered on click, show, error and close
+    // var that = this;
+    // var success = function(result) {
+    //     if (!result) {
+    //         return;
+    //     }
+    //     if (result === 'show') {
+    //         that.onshow();
+    //     } else if (result === 'click') {
+    //         that.onclick();
+    //     }
+    // };
+    // var failure = function() {
+    //     that.onerror();
+    // };
+    exec(function() { console.log('Notification(s) created') }, function(err) { console.error('Failed to create notification(s): ' + err) }, 'LocalNotifications', 'show', notifications);
+}
+
+/**
+  * @description checks if app has permission to show a local notification.
+  * @function hasPermission
+  * @memberof LocalNotification
+  * @param {!callback} callback - See type definition.
+  */
+LocalNotification.hasPermission = function(callback) {
+    if (!callback) { callback = function() {}; }
+
+    if (typeof callback !== 'function')  {
+        console.log('LocalNotification.hasPermission failure: callback parameter not a function');
+        return;
+    }
+
+    exec(function(status) { callback(status === "granted") }, function() { console.log('hasPermission error') }, 'LocalNotifications', 'hasPermission', [{}]);
 };
 
 /**
@@ -78,15 +112,13 @@ LocalNotification.settings = function() {
 };
 
 /**
-  * @description requests permission from the user to show a local notification.
+  * @description Cancels an existing notification
   * @function cancel
   * @memberof LocalNotification
   * @param {!string} tag of the local notification.
   */
 LocalNotification.cancel = function(tag) {
-    exec(function() {
-    }, function() {
-    }, 'LocalNotifications', 'close', [{tag: tag}]);
+    exec(function() {}, function() {}, 'LocalNotifications', 'close', [{tag: tag}]);
 };
 
 exec(function(data) {
@@ -114,3 +146,5 @@ exec(function(data) {
  */
 
 module.exports = LocalNotification;
+
+});
