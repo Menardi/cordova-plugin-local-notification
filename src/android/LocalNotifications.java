@@ -2,16 +2,20 @@
 package com.adobe.phonegap.notification;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.content.Intent;
 import android.support.v4.app.NotificationManagerCompat;
@@ -25,6 +29,8 @@ import android.os.Build;
 public class LocalNotifications extends CordovaPlugin {
 
     private static final String TAG = "LocalNotifications";
+    private static Boolean deviceReady = false;
+    private static String waitingJs = "";
 
     public static CallbackContext notificationContext;
 
@@ -96,11 +102,51 @@ public class LocalNotifications extends CordovaPlugin {
             context.startActivity(intent);
         } else if (action.equals("listen")) {
             notificationContext = callbackContext;
+        } else if (action.equals("deviceready")) {
+            onDeviceReady();
         } else {
             Log.d(TAG, "return false");
             return false;
         }
         return true;
+    }
+
+    public void onDeviceReady() {
+        Log.v(TAG, "Device ready. Waiting JS: " + waitingJs);
+        deviceReady = true;
+
+        if(waitingJs.length() > 0) {
+            sendJs(waitingJs);
+            waitingJs = "";
+        }
+
+        // Cordova only fires onNewIntent after deviceready. Here we send the intent that
+        // started the app, so we can tell the app if it was started by a notification.
+        onNewIntent(cordova.getActivity().getIntent());
+    }
+
+    public void onNewIntent(Intent intent) {
+        Log.v(TAG, "New intent!");
+        String notificationTag = intent.getStringExtra("notificationTag");
+
+        if (notificationTag.length() > 0) {
+            sendJs("LocalNotification._triggerEvent('notificationclick', { tag: '" + notificationTag + "' });");
+        }
+    }
+
+    private void sendJs(String js) {
+        Log.v(TAG, "Sending JS: " + js);
+        if(deviceReady) {
+            ((Activity) webView.getContext()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    webView.loadUrl(("javascript:" + js));
+                }
+            });
+        } else {
+            Log.v(TAG, "Not ready for JS: " + js);
+            waitingJs.concat(js);
+        }
     }
 
     private void showNotification(JSONObject args) throws JSONException {
@@ -127,4 +173,3 @@ public class LocalNotifications extends CordovaPlugin {
 //        AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, when, pendingIntent);
     }
 }
-

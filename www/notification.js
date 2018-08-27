@@ -121,6 +121,11 @@ LocalNotification.cancel = function(tag) {
     exec(function() {}, function() {}, 'LocalNotifications', 'close', [{tag: tag}]);
 };
 
+LocalNotification._triggerEvent = function(eventName, data = {}) {
+    // TODO: Handle events internally
+    document.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+}
+
 exec(function(data) {
         var event = new CustomEvent("localnotification", { detail: data });
         document.dispatchEvent(event);
@@ -128,6 +133,10 @@ exec(function(data) {
         console.log("LISTEN ERROR: ", e);
     }, 'LocalNotifications', 'listen', [{}]
 );
+
+document.addEventListener('deviceready', function() {
+    exec(function() {}, function() {}, 'LocalNotifications', 'deviceready', []);
+});
 
 /**
  * @description A callback to be used when the requestPermission method returns a value.

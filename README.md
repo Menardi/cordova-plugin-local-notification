@@ -1,6 +1,8 @@
 
 # phonegap-plugin-local-notification
 
+> Only currently tested on Android, API may change without warning. Use at your own risk!
+
 A work-in-progress fork of `phonegap-plugin-local-notification` which allows for scheduling of notifications.
 
 ## Usage
@@ -46,3 +48,13 @@ Request the user to enable the notifications permission.
 ### LocalNotifications.settings()
 
 Open the settings screen where the user can manually grant notification permission.
+
+## Handling events
+
+When a notification is tapped, the `notificationclick` event is fired on the `document`. The notification's tag is passed under the `detail` object in the callback's event argument.
+
+```
+document.addEventListener('notificationclick', function(ev) {
+    console.log('Notification clicked: ' + ev.detail.tag);
+});
+```

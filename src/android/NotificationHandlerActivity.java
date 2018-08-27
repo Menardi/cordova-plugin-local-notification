@@ -2,17 +2,13 @@ package com.adobe.phonegap.notification;
 
 import android.app.Activity;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.NotificationCompat;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.support.v4.app.RemoteInput;
-import android.content.BroadcastReceiver;
 import android.net.Uri;
 
- public class NotificationHandlerActivity extends Activity {
+import com.syncostyle.onethingchristmas.MainActivity;
+
+public class NotificationHandlerActivity extends Activity {
     private static String LOG_TAG = "LocalNotification_PushHandlerActivity";
 
     /*
@@ -24,15 +20,27 @@ import android.net.Uri;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
+        Intent receivedIntent = getIntent();
+        Bundle extras = receivedIntent.getExtras();
         String tag = extras.getString("tag", "");
+
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         notificationManager.cancel(tag, 0);
+
         String url = extras.getString("url", "");
-        Uri uri = Uri.parse(url); // missing 'http://' will cause crashed
-        Intent intent2 = new Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent2);
+
+        Intent intent;
+        if(url.length() > 0) {
+            Uri uri = Uri.parse(url);
+            intent = new Intent(Intent.ACTION_VIEW, uri);
+        } else {
+            intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("notificationTag", tag);
+        }
+
+        startActivity(intent);
+
         finish();
     }
 }
