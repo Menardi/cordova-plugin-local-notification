@@ -59,7 +59,6 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             String body = args.getString("body");
             String tag = args.getString("tag");
             String icon = args.getString("icon");
-            String smallIcon = args.getString("smallIcon");
             String sound = args.getString("sound");
             String url = args.getString("url");
 
@@ -75,8 +74,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             int smallIconRes;
-            if (smallIcon.startsWith("res://")) {
-                String iconId = smallIcon.replaceFirst("res://", "");
+            if (icon.startsWith("res://")) {
+                String iconId = icon.replaceFirst("res://", "");
                 Log.v(TAG, "Using small icon: " + iconId);
                 smallIconRes = resources.getIdentifier(iconId, "drawable", context.getPackageName());
             } else {
@@ -111,4 +110,3 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         }
     }
 }
-

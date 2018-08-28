@@ -38,7 +38,7 @@ public class LocalNotifications extends CordovaPlugin {
      * Executes the request and returns PluginResult.
      *
      * @param action            The action to execute.
-     * @param args              JSONArry of arguments for the plugin.
+     * @param args              JSONArray of arguments for the plugin.
      * @param callbackContext   The callback context from which we were invoked.
      */
     @SuppressLint("NewApi")
@@ -47,9 +47,8 @@ public class LocalNotifications extends CordovaPlugin {
         Context context = cordova.getActivity();
 
         if (action.equals("show")) {
-            for(int i = 0; i < args.length(); i++) {
-                showNotification(args.getJSONObject(i));
-            }
+            JSONObject options = args.getJSONObject(0);
+            showNotification(options);
 
             PluginResult result = new PluginResult(PluginResult.Status.OK, "show");
             result.setKeepCallback(true);
@@ -74,7 +73,7 @@ public class LocalNotifications extends CordovaPlugin {
             }
 
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-        } else if (action.equals("hasPermission")) {
+        } else if (action.equals("hasPermission") || action.equals("requestPermission")) {
             NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
 
             if (mNotificationManager.areNotificationsEnabled()) {
@@ -82,9 +81,7 @@ public class LocalNotifications extends CordovaPlugin {
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "denied"));
             }
-        } else if (action.equals("requestPermission")) {
-            // Not implemented on Android - try "settings"
-        } else if (action.equals("settings")) {
+        } else if (action.equals("openPermissionScreen")) {
             Intent intent = new Intent();
 
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1){
@@ -129,8 +126,8 @@ public class LocalNotifications extends CordovaPlugin {
         Log.v(TAG, "New intent!");
         String notificationTag = intent.getStringExtra("notificationTag");
 
-        if (notificationTag.length() > 0) {
-            sendJs("LocalNotification._triggerEvent('notificationclick', { tag: '" + notificationTag + "' });");
+        if (notificationTag != null && notificationTag.length() > 0) {
+            sendJs("Notification._triggerEvent('notificationclick', { tag: '" + notificationTag + "' });");
         }
     }
 
@@ -151,7 +148,7 @@ public class LocalNotifications extends CordovaPlugin {
 
     private void showNotification(JSONObject args) throws JSONException {
         // Get args
-        long when = args.getLong("when");
+        long when = args.getLong("timestamp");
         if (when == 0) {
             when = System.currentTimeMillis();
         }
@@ -170,6 +167,5 @@ public class LocalNotifications extends CordovaPlugin {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC, when, pendingIntent);
-//        AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, when, pendingIntent);
     }
 }
