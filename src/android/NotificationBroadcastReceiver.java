@@ -52,61 +52,57 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
     }
 
     public void startNotification(final Context context, Intent intent) {
-        try {
-            Resources resources = context.getResources();
-            JSONObject args = new JSONObject(intent.getStringExtra("args"));
-            String title = args.getString("title");
-            String body = args.getString("body");
-            String tag = args.getString("tag");
-            String icon = args.getString("icon");
-            String sound = args.getString("sound");
-            String url = args.getString("url");
+        Resources resources = context.getResources();
 
-            Log.v(TAG, "show notification now=" + System.currentTimeMillis() + " args=" + args.toString());
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            int requestCode = new Random().nextInt();
+        String title = intent.getStringExtra("title");
+        String body = intent.getStringExtra("body");
+        String tag = intent.getStringExtra("tag");
+        String icon = intent.getStringExtra("icon");
+        String sound = intent.getStringExtra("sound");
+        String url = intent.getStringExtra("url");
 
-            Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
-            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            notificationIntent.putExtra("tag", tag);
-            notificationIntent.putExtra("url", url);
+        Log.v(TAG, "show notification now=" + System.currentTimeMillis() + " title=" + title);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        int requestCode = new Random().nextInt();
 
-            PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        notificationIntent.putExtra("tag", tag);
+        notificationIntent.putExtra("url", url);
 
-            int smallIconRes;
-            if (icon.startsWith("res://")) {
-                String iconId = icon.replaceFirst("res://", "");
-                Log.v(TAG, "Using small icon: " + iconId);
-                smallIconRes = resources.getIdentifier(iconId, "drawable", context.getPackageName());
-            } else {
-                smallIconRes = resources.getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
-            }
+        PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Uri soundUri;
-            if (sound.startsWith("res://")) {
-                String soundId = sound.replaceFirst("res://", "");
-                Log.v(TAG, "Sound file: " + soundId);
-                int soundResId = resources.getIdentifier(soundId, "raw", context.getPackageName());
-                soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + soundResId);
-            } else {
-                soundUri = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;
-            }
-
-            // Build notifications
-            NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                    .setWhen(System.currentTimeMillis())
-                    .setContentTitle(title)
-                    .setContentText(body)
-                    .setSmallIcon(smallIconRes)
-                    .setContentIntent(contentIntent)
-                    .setAutoCancel(true)
-                    .setSound(soundUri);
-
-            Notification notification = mBuilder.build();
-            notificationManager.notify(tag, 0, notification);
-        } catch (JSONException e) {
-            Log.v(TAG, "JSON ERROR: "+e);
+        int smallIconRes;
+        if (icon.startsWith("res://")) {
+            String iconId = icon.replaceFirst("res://", "");
+            Log.v(TAG, "Using small icon: " + iconId);
+            smallIconRes = resources.getIdentifier(iconId, "drawable", context.getPackageName());
+        } else {
+            smallIconRes = resources.getIdentifier("ic_statusbar_icon", "drawable", context.getPackageName());
         }
+
+        Uri soundUri;
+        if (sound.startsWith("res://")) {
+            String soundId = sound.replaceFirst("res://", "");
+            Log.v(TAG, "Sound file: " + soundId);
+            int soundResId = resources.getIdentifier(soundId, "raw", context.getPackageName());
+            soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + soundResId);
+        } else {
+            soundUri = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;
+        }
+
+        // Build notifications
+        NotificationCompat.Builder mBuilder =
+            new NotificationCompat.Builder(context)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(title)
+                .setContentText(body)
+                .setSmallIcon(smallIconRes)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setSound(soundUri);
+
+        Notification notification = mBuilder.build();
+        notificationManager.notify(tag, 0, notification);
     }
 }

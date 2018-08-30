@@ -61,9 +61,7 @@ If specified, tapping the notification will open this URL rather than opening th
 
 ### Notification.close({ tag: String })
 
-Close a notification. If it is already shown, it will be dismissed. If it is scheduled for the future, it will be unschedueld.
-
-You can either pass in the tag that was used to originally schedule it, or call it on the Notification object that was returned when you created it.
+Close a notification. If it is already shown, it will be dismissed. If it is scheduled for the future, it will be unscheduled. Pass in the tag that was used to originally schedule it.
 
 ```
 var notification = Notification('Close this', { tag: 'n1' });

@@ -80,7 +80,6 @@ Notification.requestPermission = function(callback) {
  * @param {!string} tag of the local notification.
  */
 Notification.close = function(tag) {
-    tag = tag || this.tag;
     exec(function() {}, function() {}, 'Notifications', 'close', [{tag: tag}]);
 };
 

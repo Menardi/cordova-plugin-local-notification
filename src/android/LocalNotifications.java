@@ -47,14 +47,13 @@ public class LocalNotifications extends CordovaPlugin {
         Context context = cordova.getActivity();
 
         if (action.equals("show")) {
-            JSONObject options = args.getJSONObject(0);
-            showNotification(options);
+            showNotification(args);
 
             PluginResult result = new PluginResult(PluginResult.Status.OK, "show");
             result.setKeepCallback(true);
             callbackContext.sendPluginResult(result);
         } else if (action.equals("close")) {
-            String tag = args.getJSONObject(0).getString("tag");
+            String tag = args.getString(0);
             // NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
             mNotificationManager.cancel(tag, 0);
@@ -146,9 +145,16 @@ public class LocalNotifications extends CordovaPlugin {
         }
     }
 
-    private void showNotification(JSONObject args) throws JSONException {
+    private void showNotification(JSONArray args) throws JSONException {
         // Get args
-        long when = args.getLong("timestamp");
+        String tag = args.getString(0);
+        String title = args.getString(1);
+        String body = args.getString(2);
+        long when = args.getLong(3);
+        String icon = args.getString(4);
+        String sound = args.getString(5);
+        String url = args.getString(6);
+
         if (when == 0) {
             when = System.currentTimeMillis();
         }
@@ -156,12 +162,16 @@ public class LocalNotifications extends CordovaPlugin {
         Log.v(TAG, "schedule notification now=" + System.currentTimeMillis() + " when=" + when + " args=" + args.toString());
 
         Context context = cordova.getActivity();
-        String tag = args.getString("tag");
 
         int requestCode = tag.hashCode();
 
         Intent notificationBroadcastReceiverIntent = new Intent(context, NotificationBroadcastReceiver.class);
-        notificationBroadcastReceiverIntent.putExtra("args", args.toString());
+        notificationBroadcastReceiverIntent.putExtra("tag", tag);
+        notificationBroadcastReceiverIntent.putExtra("title", title);
+        notificationBroadcastReceiverIntent.putExtra("body", body);
+        notificationBroadcastReceiverIntent.putExtra("icon", icon);
+        notificationBroadcastReceiverIntent.putExtra("sound", sound);
+        notificationBroadcastReceiverIntent.putExtra("url", url);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, notificationBroadcastReceiverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
