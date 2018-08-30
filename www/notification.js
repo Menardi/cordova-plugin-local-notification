@@ -21,6 +21,11 @@ var Notification = function(title, options) {
         sound: options.sound || '',
         url: options.url || ''
     };
+    
+    // iOS will crash if the tag is not a string
+    if(typeof this.options.tag !== "string") {
+        this.options.tag = this.options.tag.toString();
+    }
 
     if(options.timestamp instanceof Date) {
         this.options.timestamp = options.timestamp.getTime();

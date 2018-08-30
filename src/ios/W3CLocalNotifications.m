@@ -52,17 +52,17 @@
     self.callbackId = command.callbackId;
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     UNMutableNotificationContent *content = [UNMutableNotificationContent new];
-    content.title = [command.arguments objectAtIndex:0];
-    content.body = [command.arguments objectAtIndex:3];
+    content.title = [command.arguments objectAtIndex:1];
+    content.body = [command.arguments objectAtIndex:2];
     content.badge = [NSNumber numberWithInt:1];
-    NSString *identifier = [command.arguments objectAtIndex:4];
-    NSString *imageUrl = [command.arguments objectAtIndex:5];
-    NSString *soundUrl = [command.arguments objectAtIndex:6];
-    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:8], @"imageUrl": imageUrl, @"soundUrl": soundUrl};
-    double ms = [[command.arguments objectAtIndex:7] doubleValue];
+    NSString *identifier = [command.arguments objectAtIndex:0];
+    NSString *imageUrl = [command.arguments objectAtIndex:4];
+    NSString *soundUrl = [command.arguments objectAtIndex:5];
+    content.userInfo = @{@"deep_link_action": [command.arguments objectAtIndex:6], @"imageUrl": imageUrl, @"soundUrl": soundUrl};
+    double ms = [[command.arguments objectAtIndex:3] doubleValue];
     NSDate *when = [NSDate dateWithTimeIntervalSince1970:ms / 1000.0];
-    //NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
-    //NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
+    NSISO8601DateFormatter *dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    NSLog(@"Notification set at: %@",[dateFormatter stringFromDate:when]);
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *date = [calendar components:(NSCalendarUnitYear  |
                                                    NSCalendarUnitMonth |
@@ -72,13 +72,13 @@
                                                    NSCalendarUnitSecond) fromDate:when];
     UNCalendarNotificationTrigger* trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:NO];
     //[content setValue:@YES forKey:@"shouldAlwaysAlertWhileAppIsForeground"];
-    UNNotificationAttachment *imageAttachment = [self loadAttachment:imageUrl];
-    if (imageAttachment) {
-        NSLog(@"loading notification image: %@",imageUrl);
-        content.attachments = @[imageAttachment];
-    }
-    NSLog(@"loading notification sound: %@",soundUrl);
-    content.sound = [self loadSound:soundUrl];
+//    UNNotificationAttachment *imageAttachment = [self loadAttachment:imageUrl];
+//    if (imageAttachment) {
+//        NSLog(@"loading notification image: %@",imageUrl);
+//        content.attachments = @[imageAttachment];
+//    }
+//    NSLog(@"loading notification sound: %@",soundUrl);
+//    content.sound = [self loadSound:soundUrl];
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger ];
     [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
@@ -86,7 +86,7 @@
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } else {
-            NSLog(@"alarm scheduled");
+            NSLog(@"Notification scheduled: %@", trigger.dateComponents);
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"show"];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -122,19 +122,37 @@
         }
     }];
 }
-- (void)settings:(CDVInvokedUrlCommand*)command {
-    NSLog(@"in plugin, settings");
 
-    if (&UIApplicationOpenSettingsURLString != nil) {
-       NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-        [[UIApplication sharedApplication] openURL:url];
-    }
+- (void)hasPermission:(CDVInvokedUrlCommand*)command {
+    UNUserNotificationCenter *center = UNUserNotificationCenter.currentNotificationCenter;
+    
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
+        BOOL granted = (settings.authorizationStatus == UNAuthorizationStatusAuthorized) && (settings.notificationCenterSetting == UNNotificationSettingEnabled);
+        
+        if (granted) {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"granted"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        } else {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"denied"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
 }
+
+- (void)openPermissionScreen:(CDVInvokedUrlCommand*)command {
+   NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    [[UIApplication sharedApplication] openURL:url];
+}
+
 - (void)notificationClicked {
     NSLog(@"in plugin, local notification clicked");
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"click"];
     [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+}
+
+- (void)deviceready {
+    // Not needed on iOS
 }
 
 @end
