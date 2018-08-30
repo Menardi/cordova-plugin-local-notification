@@ -13,19 +13,19 @@ var Notification = function(title, options) {
         throw new Error('Title is required for Notification');
     }
 
-    var notificationOptions = {
+    this.options = {
+        tag: options.tag || '',
         title: title,
         body: options.body || '',
-        tag: options.tag || '',
         icon: options.icon || '',
-        url: options.url || '',
-        sound: options.sound || ''
+        sound: options.sound || '',
+        url: options.url || ''
     };
 
     if(options.timestamp instanceof Date) {
-        notificationOptions.timestamp = options.timestamp.getTime();
+        this.options.timestamp = options.timestamp.getTime();
     } else {
-        notificationOptions.timestamp = options.timestamp || 0;
+        this.options.timestamp = options.timestamp || 0;
     }
 
     // this.permission = 'granted';
@@ -50,7 +50,7 @@ var Notification = function(title, options) {
         that.onerror();
     };
 
-    exec(success, failure, 'Notifications', 'show', [notificationOptions]);
+    exec(success, failure, 'Notifications', 'show', [this.options.tag, this.options.title, this.options.body, this.options.timestamp, this.options.icon, this.options.sound, this.options.url]);
 }
 
 /**
@@ -80,7 +80,7 @@ Notification.requestPermission = function(callback) {
  * @param {!string} tag of the local notification.
  */
 Notification.close = function(tag) {
-    exec(function() {}, function() {}, 'Notifications', 'close', [{tag: tag}]);
+    exec(function() {}, function() {}, 'Notifications', 'close', [tag]);
 };
 
 //
