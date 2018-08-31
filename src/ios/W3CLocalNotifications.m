@@ -114,7 +114,7 @@
 
 - (void)openPermissionScreen:(CDVInvokedUrlCommand*)command {
    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-    [[UIApplication sharedApplication] openURL:url];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 - (void)notificationClicked {
