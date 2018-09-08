@@ -49,9 +49,11 @@ The tag is an ID which can be used to reference the notification. For example, a
 
 The main body of the notification. For example, for a messaging app, this would normally be the contents of the message, whereas the sender would be the title.
 
-##### options.icon (String) [Required on Android]
+##### options.icon (String) [Android only]
 
 On Android, this is the icon that shows in the notification bar (the `smallIcon`). It **must** be in your `res/drawable` folders, and cannot be from anywhere else. On Android, the icon should be referenced without its extension, and with `res://` in front to show that it is in your res folder. For example, if you have an icon called `mynotification.png`, then this option should be `icon: 'res://mynotification`.
+
+On iOS, the system automatically uses your app's icon, and this cannot be changed.
 
 ##### options.timestamp (Number or Date)
 
@@ -64,7 +66,11 @@ time: new Date('2020-01-01T08:00:00') // 8am on 1/1/2020
 
 ##### options.sound (String) [Not in spec]
 
-The sound to play when the notification is shown. On Android, this must be in your `res/raw` folder, and referenced similarly to the icon above -- `mynotification.mp3` would be `sound: 'res://mynotification`. If not specified, the system default sound will be used.
+The sound to play when the notification is shown. Note that the only format supported by both Android and iOS is `.wav`.
+
+On Android, this must be in your `res/raw` folder, and referenced similarly to the icon above -- `mynotification.wav` would be `sound: 'res://mynotification`. If not specified, the system default sound will be used.
+
+On iOS, this can be loaded directly from your `www` folder. Prefix the path with `file://`. So, if your audio file is located in `www/audio/notification.wav`, set `sound: 'file://audio/notification.wav'`.
 
 ##### options.url (String) [Not in spec]
 
@@ -101,9 +107,6 @@ Close a notification. If it is already shown, it will be dismissed. If it is sch
 
 ```
 var notification = Notification('Close this', { tag: 'n1' });
-
-// Both of these do the same thing
-notification.close();
 Notification.close('n1');
 ```
 
