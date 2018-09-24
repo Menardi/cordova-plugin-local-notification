@@ -1,41 +1,24 @@
 
 package com.adobe.phonegap.notification;
 
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.PluginResult;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.media.AudioAttributes;
 import android.net.Uri;
-import android.support.v4.app.NotificationManagerCompat;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.util.Base64;
-import android.os.Parcelable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Random;
 import android.content.BroadcastReceiver;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
-import java.util.List;
-
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
@@ -60,9 +43,13 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         String icon = intent.getStringExtra("icon");
         String sound = intent.getStringExtra("sound");
         String url = intent.getStringExtra("url");
+        String channelId = intent.getStringExtra("channelId");
+        String channelName = intent.getStringExtra("channelName");
+        String channelDescription = intent.getStringExtra("channelDescription");
 
         Log.v(TAG, "show notification now=" + System.currentTimeMillis() + " title=" + title);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
         int requestCode = new Random().nextInt();
 
         Intent notificationIntent = new Intent(context, NotificationHandlerActivity.class);
@@ -91,16 +78,32 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             soundUri = android.provider.Settings.System.DEFAULT_NOTIFICATION_URI;
         }
 
+        if(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+
+            if(channelDescription.length() > 0) {
+                mChannel.setDescription(channelDescription);
+            }
+
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build();
+
+            mChannel.setSound(soundUri, audioAttributes);
+
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
         // Build notifications
-        NotificationCompat.Builder mBuilder =
-            new NotificationCompat.Builder(context)
-                .setWhen(System.currentTimeMillis())
-                .setContentTitle(title)
-                .setContentText(body)
-                .setSmallIcon(smallIconRes)
-                .setContentIntent(contentIntent)
-                .setAutoCancel(true)
-                .setSound(soundUri);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
+            .setWhen(System.currentTimeMillis())
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSmallIcon(smallIconRes)
+            .setContentIntent(contentIntent)
+            .setAutoCancel(true)
+            .setSound(soundUri);
 
         Notification notification = mBuilder.build();
         notificationManager.notify(tag, 0, notification);

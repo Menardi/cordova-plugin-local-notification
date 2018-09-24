@@ -13,15 +13,21 @@ var Notification = function(title, options) {
         throw new Error('Title is required for Notification');
     }
 
+    var channel = options.channel || {};
+    channel.id = channel.id || 'default';
+    channel.name = channel.name || 'Default';
+    channel.description = channel.description || '';
+
     this.options = {
         tag: options.tag || '',
         title: title,
         body: options.body || '',
         icon: options.icon || '',
         sound: options.sound || '',
-        url: options.url || ''
+        url: options.url || '',
+        channel: channel
     };
-    
+
     // iOS will crash if the tag is not a string
     if(typeof this.options.tag !== "string") {
         this.options.tag = this.options.tag.toString();
@@ -55,7 +61,7 @@ var Notification = function(title, options) {
         that.onerror();
     };
 
-    exec(success, failure, 'Notifications', 'show', [this.options.tag, this.options.title, this.options.body, this.options.timestamp, this.options.icon, this.options.sound, this.options.url]);
+    exec(success, failure, 'Notifications', 'show', [this.options.tag, this.options.title, this.options.body, this.options.timestamp, this.options.icon, this.options.sound, this.options.url, this.options.channel]);
 }
 
 /**

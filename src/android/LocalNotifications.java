@@ -155,6 +155,11 @@ public class LocalNotifications extends CordovaPlugin {
         String sound = args.getString(5);
         String url = args.getString(6);
 
+        JSONObject channel = new JSONObject(args.getString(7));
+        String channelId = channel.getString("id");
+        String channelName = channel.getString("name");
+        String channelDescription = channel.getString("description");
+
         if (when == 0) {
             when = System.currentTimeMillis();
         }
@@ -172,6 +177,9 @@ public class LocalNotifications extends CordovaPlugin {
         notificationBroadcastReceiverIntent.putExtra("icon", icon);
         notificationBroadcastReceiverIntent.putExtra("sound", sound);
         notificationBroadcastReceiverIntent.putExtra("url", url);
+        notificationBroadcastReceiverIntent.putExtra("channelId", channelId);
+        notificationBroadcastReceiverIntent.putExtra("channelName", channelName);
+        notificationBroadcastReceiverIntent.putExtra("channelDescription", channelDescription);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, notificationBroadcastReceiverIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
