@@ -125,9 +125,8 @@
 
 - (void)notificationClicked {
     NSLog(@"in plugin, local notification clicked");
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"click"];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
+    [self.commandDelegate evalJs:@"Notification._triggerEvent('notificationclick');"];
 }
 
 - (void)deviceready {
