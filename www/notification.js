@@ -121,6 +121,12 @@ Notification.openPermissionScreen = function() {
     }, 'Notifications', 'openPermissionScreen', [{}]);
 };
 
+Notification.setBadge = function(count) {
+    count = parseInt(count, 10) || 0;
+
+    exec(function() {}, function() { console.error('Could not set badge') }, 'Notifications', 'setBadge', [count]);
+}
+
 Notification._triggerEvent = function(eventName, data) {
     // TODO: Handle events internally
     data = data || {};

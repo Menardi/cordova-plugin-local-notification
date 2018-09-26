@@ -18,7 +18,8 @@
 - (void)requestPermission:(CDVInvokedUrlCommand*)command;
 - (void)hasPermission:(CDVInvokedUrlCommand*)command;
 - (void)notificationClicked;
-- (void)deviceready;
 - (void)openPermissionScreen:(CDVInvokedUrlCommand*)command;
+- (void)setBadge:(CDVInvokedUrlCommand*)command;
+- (void)deviceready;
 
 @end

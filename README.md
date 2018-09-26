@@ -151,3 +151,13 @@ document.addEventListener('notificationclick', function(ev) {
     console.log('Notification clicked: ' + ev.detail.tag);
 });
 ```
+
+### Notification.setBadge(count) [Not in spec] [iOS Only]
+
+On iOS you can set the app's icon's badge (the red circle with a number on it). A count of 0 hides the badge.
+
+```
+Notification.setBadge(1); // shows a red circle with 1 on the app's icon
+Notification.setBadge(0); // hides the red circle
+```
+
