@@ -18,7 +18,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.content.Intent;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
 import android.net.Uri;
 import android.os.Build;

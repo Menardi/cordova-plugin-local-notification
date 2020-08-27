@@ -1,7 +1,7 @@
 package com.adobe.phonegap.notification;
 
 import android.app.Activity;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationManagerCompat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.net.Uri;
